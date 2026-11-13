@@ -1,0 +1,23 @@
+# Heavy or noisy: keep out of agent context
+data/
+checkpoints/
+runs/
+wandb/
+.venv/
+__pycache__/
+**/__pycache__/
+**/.ipynb_checkpoints/
+*.pt
+*.ckpt
+*.onnx
+*.npz
+*.npy
+*.mp4
+*.avi
+*.mov
+*.gif
+*.webm
+
+# Cursor hides many *.csv and *.png files by default. Un-ignore the summaries the agent should read.
+!results/summary.csv
+!results/figures/*.png

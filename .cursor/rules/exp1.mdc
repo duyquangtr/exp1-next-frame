@@ -1,0 +1,15 @@
+---
+description: Exp 1 specifics — generated notebook, residual model, and data/split/seed/metric integrity
+globs: exp1.py,build_nb.py,smoke_exp1.py,tests/**,exp1_next_frame_world_model.ipynb,results/**,configs/**
+alwaysApply: false
+---
+
+# Exp 1 file-scoped rules
+
+- Never edit `exp1_next_frame_world_model.ipynb` by hand. Edit `build_nb.py` or `exp1.py` and regenerate with: `uv run python build_nb.py`
+- Do not change the data generator, the train/val split, the seeds, or the metric code without flagging it in bold at the top of your reply. Those decide whether results are comparable.
+- Residual path: predict the change, add it to the last frame (`x[:, -1:]`), clamp to [0, 1]. A zeroed decoder must equal copy-last.
+- Split by video, never by window. Mean-frame baseline uses train videos only.
+- Windows: input `X` is `(N, K, 32, 32)`, target `Y` is `(N, 1, 32, 32)`. For K=3, `Y[0]` is frame 3, not frame 2.
+- Save paths must be portable (pathlib, relative to the project folder). Do not hard-code `/workspace/...` or other machine-specific paths.
+- Smoke numbers are not results. Do not put them in the README as the Exp 1 result. Full config is 1,000/200 videos, 8 epochs, seeds 0/1/2, Colab T4.
