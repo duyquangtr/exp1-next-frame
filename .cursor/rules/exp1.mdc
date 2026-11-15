@@ -1,6 +1,6 @@
 ---
 description: Exp 1 specifics — generated notebook, residual model, and data/split/seed/metric integrity
-globs: exp1.py,build_nb.py,smoke_exp1.py,tests/**,exp1_next_frame_world_model.ipynb,results/**,configs/**
+globs: exp1/**,exp1.py,build_nb.py,smoke_exp1.py,tests/**,exp1_next_frame_world_model.ipynb,results/**,configs/**
 alwaysApply: false
 ---
 

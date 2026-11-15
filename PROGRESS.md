@@ -1,8 +1,8 @@
 # PROGRESS.md
-Updated: Fri Nov 13, 2026, ET    Phase: P0 Exp 1    Branch: chore/setup
+Updated: Sun Nov 15, 2026, ET    Phase: P0 Exp 1    Branch: feat/data
 
 ## Current goal
-Extract `exp1.py` from the box scaffold, add real tests beyond env smoke, and fix the Windows save-path bug in `smoke_exp1.py`. No full training until checkpoints 1–2 pass.
+Step 1 data is in. Next is Step 2: copy-last and mean-frame baselines plus MSE and SSIM, on a new branch off `main` after this lands.
 
 ## Done
 - Cursor setup files drafted (`AGENTS.md`, `.cursor/rules/exp1.mdc`, this file, ignore files).
@@ -11,8 +11,15 @@ Extract `exp1.py` from the box scaffold, add real tests beyond env smoke, and fi
   - `uv run ruff check .` ; `uv run ruff format --check .` → All checks passed
   - `uv run pyright` → 0 errors
   - `uv run pytest -q` → 1 passed
-- Scaffold exists in the World Model Lab box copy (`build_nb.py`, generated notebook, `smoke_exp1.py`). Functions still live there; `exp1.py` not extracted yet.
-- Smoke run only (seed 0, 200 train / 50 val, 2 epochs, CPU, box): conv val MSE 0.00087 vs copy-last 0.00557; conv val SSIM 0.968 vs 0.885. Not a result. Rollout-10 and mean-frame were not recorded.
+- **Step 1 data (box, Sun Nov 15, 2026, branch `feat/data`, not pushed):** package `exp1/data.py` — moving square/circle videos, video-level train/val/test split, `MovingShapesDataset` windows. Tests written first (`tests/test_data.py`), then the module. Proof:
+  - `uv run pytest -q tests/test_data.py` before the module → collection error `ModuleNotFoundError: No module named 'exp1'`
+  - `uv run pytest -q` after the module → 14 passed (13 data + 1 env)
+  - `uv run ruff check .` ; `uv run ruff format --check .` → All checks passed
+  - `uv run pyright` → 0 errors, 0 warnings
+  - Sample window figure: `results/step1_sample.png` (untracked; also copied to `/workspace/exp1_step1_sample.png` on the box)
+- Layout deviation: Step 1 uses package `exp1/data.py` rather than a single `exp1.py`. `pyproject.toml` now has a hatchling build so `import exp1` works under `uv run`.
+- Generator deviation from the World Model Lab scaffold: hard-edged circles and squares, not soft Gaussian blobs. Same kinematics idea (constant velocity, bounce, 1–2 shapes, 32×32, T=20, K=3). Flagged so later numbers are not compared blindly to the old smoke run.
+- Scaffold still also lives in the World Model Lab box copy (`build_nb.py`, generated notebook, `smoke_exp1.py`). Those files are not in this repo yet.
 
 ## Decisions and why
 - Split by video, not by window: adjacent windows share K−1 frames, so a window split leaks.
@@ -21,16 +28,19 @@ Extract `exp1.py` from the box scaffold, add real tests beyond env smoke, and fi
 - Torch on laptop: PyTorch CPU index in `pyproject.toml` (`explicit = true`). Colab uses its preinstalled torch, not this lockfile slice.
 - GPU work on free Colab T4; home CPU for smoke and tests.
 - Commit or push only when Stephen asks.
+- Default split sizes are 800/100/100 videos (configurable). The later full-train recipe in AGENTS.md (1000/200) can be passed explicitly when training starts.
+- Minimum shape speed 0.5 px/frame so copy-last is not already almost perfect.
+- Overlapping shapes add and clip, so a crossing is a brighter patch.
 
 ## Open questions
 - Does Cursor's command sandbox work on native Windows? Docs cover Mac and Linux only.
 - MetaDrive / Python 3.13 is a later-phase risk (not in scope for Exp 1).
 
 ## Next step
-Teach-first: explain `make_videos` and `windows` (shapes, dtypes, axes) and what would silently break if K went from 3 to 1. Then plan portable save path in `smoke_exp1.py` when copying scaffold in.
+Step 2 on a new branch off `main` (after `feat/data` is merged or applied): copy-last and mean-frame baselines, MSE and SSIM. Teach-first before writing code. Still no full training.
 
 ## Last verified results
-- Date: Fri Nov 13, 2026 (Windows laptop).
-- What was run: `uv run pytest -q -s tests/test_env.py` ; `uv run ruff check .` ; `uv run pyright` ; `uv run pytest -q`.
-- Outcome: env and toolchain green; one env test only (no `exp1.py` yet).
-- Not yet verified: `smoke_exp1.py` on Windows path, full pytest suite, multi-seed, mean-frame, Colab full train.
+- Date: Sun Nov 15, 2026 (box).
+- What was run: `uv run pytest -q tests/test_data.py` (failing, then passing); `uv run pytest -q` ; `uv run ruff check .` ; `uv run ruff format --check .` ; `uv run pyright` ; `uv run python -m exp1.data`.
+- Outcome: data contract tests green; sample window figure written. Torch 2.11.0+cpu installed fine on the box.
+- Not yet verified: baselines, training loop, multi-seed, Colab full train, `smoke_exp1.py` on Windows path. No `feat/data` push.

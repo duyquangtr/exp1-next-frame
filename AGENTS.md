@@ -12,7 +12,9 @@ Predict the next 32×32 frame of a synthetic bouncing-blob video from the last K
 
 ## Layout (planned)
 ```
-exp1.py          # data, model, metrics, train/eval (extract from build_nb.py)
+exp1/            # package (Step 1 uses this instead of a single exp1.py)
+  data.py        # moving-shapes generator, video-level split, window dataset
+  # model / metrics / train modules land in later steps
 build_nb.py      # regenerates the Colab notebook; do not edit the .ipynb by hand
 smoke_exp1.py    # tiny CPU smoke run
 tests/           # pytest: data, shapes, split leakage, model, overfit
@@ -20,6 +22,8 @@ configs/         # seeds and train/eval knobs
 results/         # summary.csv and figures written by scripts (committed)
 runs/            # raw logs and checkpoints (gitignored)
 ```
+The first plan was one `exp1.py` extracted from the World Model Lab scaffold.
+Step 1 starts a package so each later step can land as its own module.
 
 ## Commands (Windows PowerShell: chain with `;`, never `&&`)
 - Setup: `uv sync`
